@@ -1,5 +1,6 @@
 <?php
 
+use backend\decorators\AppleDecorator;
 use backend\models\Apple;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -8,6 +9,7 @@ use yii\widgets\ActiveForm;
 /** @var array $apples */
 /** @var Apple $apple */
 
+$decorator = new AppleDecorator();
 $this->title = 'Я-я-яблоки ела';
 ?>
 <div class="site-index">
@@ -34,7 +36,7 @@ $this->title = 'Я-я-яблоки ела';
             <td>Яблоко-<?= $apple->id ?></td>
             <td><?= $apple->color ?></td>
             <td><?= $apple->size ?></td>
-            <td><?= $apple->status ?></td>
+            <td><?= $decorator->getStatus($apple) ?></td>
             <td>
                 <?php if ($apple->status === Apple::STATUS_HANGING): ?>
                 <?php $form = ActiveForm::begin(['action' =>['apple/fall']]); ?>

@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\decorators\AppleDecorator;
 use backend\models\Apple;
 use Yii;
 use yii\base\Exception;
