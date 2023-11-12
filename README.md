@@ -2,7 +2,7 @@ git clone https://github.com/grvaz/apple-test.git \
 yii migrate \
 Логин в backend: \
 username: test \
-password: pass12345 \
+password: pass12345
 
 Видео работы приложения: https://youtu.be/3tD0rQlYtAg \
 \
