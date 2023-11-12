@@ -2,12 +2,13 @@
 
 namespace backend\controllers;
 
-use common\models\LoginForm;
+use backend\models\Apple;
 use Yii;
+use yii\base\Exception;
+use yii\base\InvalidConfigException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\web\Controller;
-use yii\web\Response;
 
 /**
  * Site controller
@@ -24,11 +25,11 @@ class AppleController extends Controller
                 'class' => AccessControl::class,
                 'rules' => [
                     [
-                        'actions' => ['login', 'error'],
+                        'actions' => ['error'],
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index'],
+                        'actions' => ['generate', 'index', 'fall', 'eat'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -37,7 +38,9 @@ class AppleController extends Controller
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
-                    'logout' => ['post'],
+                    'generate' => ['post'],
+                    'fall' => ['post'],
+                    'eat' => ['post'],
                 ],
             ],
         ];
@@ -62,6 +65,65 @@ class AppleController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $apples = Apple::find()->all();
+        return $this->render('index', compact('apples'));
+    }
+
+    /**
+     * Создать яблоки.
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function actionGenerate()
+    {
+        Yii::$app->db->createCommand()->truncateTable(Apple::getTableSchema()->name)->execute();
+        for ($i = 0; $i < rand(5, 20); $i++) {
+            $colors = ['red', 'green', 'yellow'];
+            shuffle($colors);
+            $apple = new Apple($colors[0]);
+            $apple->save();
+        }
+        return $this->redirect(['apple/index']);
+    }
+
+    /**
+     * Уронить яблоко.
+     * @throws Exception
+     */
+    public function actionFall()
+    {
+        $apple = $this->findModel(Yii::$app->request->post('id'));
+        $apple->fallToGround();
+        return $this->redirect(['apple/index']);
+    }
+
+    /**
+     * Откусить яблоко.
+     *
+     * @throws InvalidConfigException
+     * @throws Exception
+     * @throws \Throwable
+     */
+    public function actionEat()
+    {
+        $params = Yii::$app->getRequest()->getBodyParams();
+        $apple = $this->findModel($params['id']);
+        $apple->eat($params['percent']);
+        return $this->redirect(['apple/index']);
+    }
+
+    /**
+     * @param $id
+     * @return Apple
+     * @throws Exception
+     */
+    private function findModel($id)
+    {
+        $apple = Apple::findOne(['id' => $id]);
+        if (!$apple) {
+            throw new Exception('Яблоко не найдено.', 404);
+        }
+        return $apple;
     }
 }
